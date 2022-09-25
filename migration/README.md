@@ -39,33 +39,35 @@ Now, it's time to perform a online migration of the Adventureworks2019 database 
     BACKUP DATABASE AdventureWorks2019 TO URL = 'https://storagemigration.blob.core.windows.net/backup/AdventureWorks2019.bak'
     ```
 
-3. Online migration
+3. **Online migration**
 
     Use the **az datamigration sql-managed-instance create** command to create and start a database migration.
 
-az datamigration sql-managed-instance create `
---source-location '{\"AzureBlob\":{\"storageAccountResourceId\":\"/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.Storage/storageAccounts/<StorageAccountName>\",\"accountKey\":\"<StorageKey>\",\"blobContainerName\":\"AdventureWorksContainer\"}}' `
---migration-service "/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.DataMigration/SqlMigrationServices/MySqlMigrationService" `
---scope "/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.Sql/managedInstances/<ManagedInstanceName>" `
---source-database-name "AdventureWorks2019" `
---source-sql-connection authentication="SqlAuthentication" data-source="<AzureSQLVM_IPAddress>" password="My$upp3r$ecret" user-name="sqladmin" `
---target-db-name "AdventureWorks2019" `
---resource-group <ResourceGroupName> `
---managed-instance-name <ManagedInstanceName>
+    ```dotnetcli
+    az datamigration sql-managed-instance create `
+    --source-location '{\"AzureBlob\":{\"storageAccountResourceId\":\"/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.Storage/storageAccounts/<StorageAccountName>\",\"accountKey\":\"<StorageKey>\",\"blobContainerName\":\"AdventureWorksContainer\"}}' `
+    --migration-service "/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.DataMigration/SqlMigrationServices/MySqlMigrationService" `
+    --scope "/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.Sql/managedInstances/<ManagedInstanceName>" `
+    --source-database-name "AdventureWorks2019" `
+    --source-sql-connection authentication="SqlAuthentication" data-source="<AzureSQLVM_IPAddress>" password="My$upp3r$ecret" user-name="sqladmin" `
+    --target-db-name "AdventureWorks2019" `
+    --resource-group <ResourceGroupName> `
+    --managed-instance-name <ManagedInstanceName>
+    ```
 
-1. In the Azure Portal, find the resource group you just created and navigate to the Azure SQL VM.
-2. In the overview page, copy the Public IP Address
+4. In the Azure Portal, find the resource group you just created and navigate to the Azure SQL VM.
+5. In the overview page, copy the Public IP Address
     ![sqlvm-ip](../media/sqlvm-ip.png)
 
     > [!CAUTION]
     > Now you have to connect to the Jumpbox VM.
     > Use the credentials provided in the deploy page.
 
-3. Install az datamigration extension. Open either a command shell or PowerShell as administrator.
+6. Install az datamigration extension. Open either a command shell or PowerShell as administrator.
 
     `az extension add --name datamigration`
 
-4. Run the following to login from your client using your default web browser
+7. Run the following to login from your client using your default web browser
 
     `az login`
 
