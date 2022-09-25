@@ -40,8 +40,6 @@ $ContainerName = "databases"
 # Give the connection string.
 $ConnectionString = "BlobEndpoint=https://1clickpocmigrationsqlmi.blob.core.windows.net/;SharedAccessSignature=sv=2021-06-08&ss=bfqt&srt=co&sp=rwdlacupiytfx&se=2050-09-04T18:00:08Z&st=2022-09-04T10:00:08Z&spr=https&sig=8OSfBUeMjicbBbpq9LGqR9ZRkYoI1%2F8ZbsXz3SWT9O8%3D"
 $Ctx = New-AzStorageContext -ConnectionString $ConnectionString
-## ?sv=2021-06-08&ss=bfqt&srt=co&sp=rwdlacupiytfx&se=2050-09-04T18:00:08Z&st=2022-09-04T10:00:08Z&spr=https&sig=8OSfBUeMjicbBbpq9LGqR9ZRkYoI1%2F8ZbsXz3SWT9O8%3D
-## https://1clickpocmigrationsqlmi.blob.core.windows.net/?sv=2021-06-08&ss=bfqt&srt=co&sp=rwdlacupiytfx&se=2050-09-04T18:00:08Z&st=2022-09-04T10:00:08Z&spr=https&sig=8OSfBUeMjicbBbpq9LGqR9ZRkYoI1%2F8ZbsXz3SWT9O8%3D
 
 #Download File
 $FileName1 = "AdventureWorks2019.bak"
