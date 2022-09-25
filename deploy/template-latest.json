@@ -20,6 +20,7 @@
     "variables": {
         // Storage account
         "storageAccountName": "[toLower(concat('storage',parameters('suffixName')))]",
+  
         // SQL VM
         "location": "[resourceGroup().location]",
         "virtualMachineName": "[if(greaterOrEquals(length(toLower(concat('sqlvm','-',parameters('suffixName')))),15),substring(toLower(concat('sqlvm','-',toLower(concat('sqlvm','-',parameters('suffixName'))))),0,15),toLower(concat('sqlvm','-',parameters('suffixName'))))]",
@@ -49,14 +50,29 @@
                     "destinationAddressPrefix": "*",
                     "destinationPortRange": "3389"
                 }
+            },
+            {
+                        "name": "AllowAnyMS_SQLInbound",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "1433",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 310,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
             }
         ],
         "publicIpAddressName": "[format('{0}-publicip-{1}', variables('virtualMachineName'), uniqueString(variables('virtualMachineName')))]",
         "publicIpAddressType": "Dynamic",
         "publicIpAddressSku": "Basic",
         "diskConfigurationType": "NEW",
-        "nsgId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
-        // "subnetRef": "[resourceId(parameters('existingVnetResourceGroup'), 'Microsoft.Network/virtualNetWorks/subnets', parameters('existingVirtualNetworkName'), parameters('existingSubnetName'))]",
         "dataDisksLuns": "[array(range(0, variables('sqlDataDisksCount')))]",
         "logDisksLuns": "[array(range(variables('sqlDataDisksCount'), variables('sqlLogDisksCount')))]",
         "dataDisks": {
@@ -67,6 +83,7 @@
             "diskSizeGB": 1023
         },
         "tempDbPath": "D:\\SQLTemp",
+ 
         // SQL MI 
         "SQLMIName": "[if(greaterOrEquals(length(toLower(concat('sqlmi','-',parameters('suffixName')))),60),substring(toLower(concat('sqlmi','-',toLower(concat('sqlmi','-',parameters('suffixName'))))),0,60),toLower(concat('sqlmi','-',parameters('suffixName'))))]",
         "SQLMIAdministratorLogin": "sqladmin",
@@ -79,27 +96,17 @@
         "SQLMIvCores": 8,
         "SQLMIStorageSizeInGB": 256,
         "SQLMILicenseType": "LicenseIncluded",
-        "SQLMINetworkSecurityGroupName": "[format('SQLMI-{0}-NSG', parameters('suffixName'))]",
-        "SQLMIRouteTableName": "[format('SQLMI-{0}-Route-Table', parameters('suffixName'))]",
+        "SQLMINetworkSecurityGroupName": "[format('sqlmi-{0}-nsg', parameters('suffixName'))]",
+        "SQLMIRouteTableName": "[format('sqlmi-{0}-route-table', parameters('suffixName'))]",
 
         // Jump Box
         "jbVirtualMachineName": "jumpbox-sqlmi",
         "jbNetworkInterfaceName": "[concat('sql-mi-', variables('SQLMIName'), '-jb-nic')]",
         "jbNetworkSecurityGroupName": "[concat('sql-mi-', variables('SQLMIName'), '-jb-nsg')]",
         "jbPublicIpAddressName": "[concat('sql-mi-', variables('SQLMIName'), '-jb-ip')]",
+        "jbVirtualNetworksName": "[concat('vnet-',parameters('suffixName'), '-jb')]",
         "SQLMIManagementSubnetName": "management",
         "SQLMIManagementSubnetPrefix": "10.0.1.0/24"
-
-
-
-        // "virtualMachineName": "[concat(take(parameters('managedInstanceName'),13), 'JB')]", -- jbVirtualMachineName
-        // "networkInterfaceName": "[concat('SQLMI-', parameters('managedInstanceName'), '-JB-NIC')]", -- jbNetworkInterfaceName
-        // "publicIpAddressName": "[concat('SQLMI-', parameters('managedInstanceName'), '-JB-IP')]", -- jbPublicIpAddressName
-        // "jbNetworkSecurityGroupName": "[concat('SQLMI-', parameters('managedInstanceName'), '-JB-NSG')]", -- jbNetworkSecurityGroupName
-
-
-
-
     },
     "resources": [
         {
@@ -112,6 +119,32 @@
             },
             "kind": "Storage"
         },
+
+
+{
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2022-05-01",
+            "name": "[concat(variables('storageAccountName'), '/default/migration')]",
+            "dependsOn": [
+                "[variables('storageAccountName')]"
+            ],
+            "properties": {
+                "immutableStorageWithVersioning": {
+                    "enabled": false
+                },
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+
+
+
+
+
+
+
+
         {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2021-08-01",
@@ -193,9 +226,9 @@
                     }
                 ],
                 "enableAcceleratedNetworking": true
-//                "networkSecurityGroup": {
-//                     "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
-//                }
+                //                "networkSecurityGroup": {
+                //                     "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                //                }
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]",
@@ -315,7 +348,7 @@
                 "serverConfigurationsManagementSettings": {
                     "sqlConnectivityUpdateSettings": {
                         "connectivityType": "PUBLIC",
-                         "port": 1433,
+                        "port": 1433,
                         "sqlAuthUpdateUserName": "[variables('adminUsername')]",
                         "sqlAuthUpdatePassword": "[variables('adminPassword')]"
                     }
@@ -325,9 +358,8 @@
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('virtualMachineName'))]"
             ]
         },
-
         {
-            // SQLMI Resources
+        // SQLMI Resources
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2021-08-01",
             "name": "[variables('SQLMINetworkSecurityGroupName')]",
@@ -452,7 +484,7 @@
                         "name": "[variables('SQLMIManagementSubnetName')]",
                         "properties": {
                             "addressPrefix": "[variables('SQLMIManagementSubnetPrefix')]",
-                             "networkSecurityGroup": {
+                            "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('SQLMINetworkSecurityGroupName'))]"
                             }
                         }
@@ -489,9 +521,19 @@
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('SQLMIvirtualNetworkName'))]"
             ]
         },
-
         // JUMP BOX
-
+        {
+            "name": "[variables('jbPublicIpAddressName')]",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2019-06-01",
+            "location": "[variables('location')]",
+            "properties": {
+                "publicIpAllocationMethod": "Dynamic"
+            },
+            "sku": {
+                "name": "Basic"
+            }
+        },
         {
             "name": "[variables('jbNetworkSecurityGroupName')]",
             "type": "Microsoft.Network/networkSecurityGroups",
@@ -516,27 +558,97 @@
             }
         },
         {
-            "name": "[variables('jbPublicIpAddressName')]",
-            "type": "Microsoft.Network/publicIpAddresses",
-            "apiVersion": "2019-06-01",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2021-02-01",
+            "name": "[variables('jbVirtualNetworksName')]",
             "location": "[variables('location')]",
+            "dependsOn": [
+                "[variables('jbNetworkSecurityGroupName')]"
+            ],
             "properties": {
-                "publicIpAllocationMethod": "Dynamic"
-            },
-            "sku": {
-                "name": "Basic"
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.2.0.0/16"
+                    ]
+                },
+                "dhcpOptions": {
+                    "dnsServers": []
+                },
+                "subnets": [
+                    {
+                        "name": "default",
+                        "properties": {
+                            "addressPrefix": "10.2.0.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('jbNetworkSecurityGroupName'))]"
+                            },
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Disabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    }
+                ],
+                "virtualNetworkPeerings": [],
+                "enableDdosProtection": false
             }
         },
-
+        // Vnet Peering
+        {
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "name": "[concat(variables('jbVirtualNetworksName'),'/peeringTo', variables('SQLMIVirtualNetworkName') )]",
+            "dependsOn": [
+                "[variables('jbVirtualNetworksName')]",
+                "[variables('SQLMIVirtualNetworkName')]"
+            ],
+            "apiVersion": "2022-01-01",
+            "properties": {
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": false,
+                "allowGatewayTransit": false,
+                "useRemoteGateways": false,
+                "remoteVirtualNetwork": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('SQLMIVirtualNetworkName'))]"
+                },
+                "remoteAddressSpace": {
+                    "addressPrefixes": [
+                        "[variables('SQLMIAddressPrefix')]"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "name": "[concat(variables('SQLMIVirtualNetworkName'),'/peeringTo',variables('jbVirtualNetworksName'))]",
+            "dependsOn": [
+                "[variables('SQLMIVirtualNetworkName')]",
+                "[variables('jbVirtualNetworksName')]"
+            ],
+            "apiVersion": "2022-01-01",
+            "properties": {
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": false,
+                "allowGatewayTransit": false,
+                "useRemoteGateways": false,
+                "remoteVirtualNetwork": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('jbVirtualNetworksName'))]"
+                },
+                "remoteAddressSpace": {
+                    "addressPrefixes": [
+                        "10.2.0.0/16"
+                    ]
+                }
+            }
+        },
+        //End Vnet Peering
         {
             "name": "[variables('jbNetworkInterfaceName')]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-06-01",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[variables('SQLMIVirtualNetworkName')]",
-                "[variables('jbPublicIpAddressName')]",
-                "[variables('jbNetworkSecurityGroupName')]"
+                "[variables('jbVirtualNetworksName')]",
+                "[variables('jbPublicIpAddressName')]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -544,7 +656,7 @@
                         "name": "ipconfig1",
                         "properties": {
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('SQLMIVirtualNetworkName'), variables('SQLMIManagementSubnetName'))]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('jbVirtualNetworksName'), 'default')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIpAddress": {
@@ -552,11 +664,13 @@
                             }
                         }
                     }
-                ],
-                "networkSecurityGroup": {
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('jbNetworkSecurityGroupName'))]"
-                }
+                ]
+                //,
+                //               "networkSecurityGroup": {
+                //                   "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('jbNetworkSecurityGroupName'))]"
+                //   }
             }
+
         },
         {
             "name": "[variables('jbVirtualMachineName')]",
