@@ -53,18 +53,6 @@ az datamigration sql-managed-instance create `
 --resource-group <ResourceGroupName> `
 --managed-instance-name <ManagedInstanceName>
 
-
-az datamigration sql-managed-instance create `
---source-location '{\"AzureBlob\":{\"storageAccountResourceId\":\"/subscriptions/81dc8f47-cdd8-44e0-a63a-94c86ba64f3e/resourceGroups/1clickpoc/providers/Microsoft.Storage/storageAccounts/1clickpoc\",\"accountKey\":\"pB16139c7LUY2Icogi80Z4s9EGBeHSd31nW2p/12B2Ov6yHF1LO1+s43VpK4aYAomJy+CT2bB+9W+AStVpxZpA==\",\"blobContainerName\":\"backup\"}}' `
---migration-service "/subscriptions/81dc8f47-cdd8-44e0-a63a-94c86ba64f3e/resourceGroups/1clickpoc/providers/Microsoft.DataMigration/SqlMigrationServices/MySqlMigrationService" `
---scope "/subscriptions/81dc8f47-cdd8-44e0-a63a-94c86ba64f3e/resourceGroups/1clickpoc/providers/Microsoft.Sql/managedInstances/sqlmi-balabuch" `
---source-database-name "AdventureWorks2019" `
---source-sql-connection authentication="SqlAuthentication" data-source="20.229.104.177" password="My$upp3r$ecret" user-name="sqladmin" `
---target-db-name "AdventureWorks2019" `
---resource-group 1clickpoc `
---managed-instance-name sqlmi-balabuch
-
-
 1. In the Azure Portal, find the resource group you just created and navigate to the Azure SQL VM.
 2. In the overview page, copy the Public IP Address
     ![sqlvm-ip](../media/sqlvm-ip.png)
