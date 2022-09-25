@@ -31,7 +31,7 @@ Now, it's time to perform a online migration of the Adventureworks2019 database 
       -- this name must match the container path, start with https and must not contain a forward slash at the end
     WITH IDENTITY='SHARED ACCESS SIGNATURE' 
       -- this is a mandatory string and should not be changed   
-     , SECRET = 'XXXXXXXXXXXXXXXXXXXX' 
+     , SECRET = '' 
        -- this is the shared access signature key. Don't forget to remove the first character "?"   
     GO
     
@@ -44,7 +44,7 @@ Now, it's time to perform a online migration of the Adventureworks2019 database 
     Use the **az datamigration sql-managed-instance create** command to create and start a database migration.
 
 az datamigration sql-managed-instance create `
---source-location '{\"AzureBlob\":{\"storageAccountResourceId\":\"/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.Storage/storageAccounts/<StorageAccountName>\",\"accountKey\":\"xxxxxxxxxxxxx\",\"blobContainerName\":\"AdventureWorksContainer\"}}' `
+--source-location '{\"AzureBlob\":{\"storageAccountResourceId\":\"/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.Storage/storageAccounts/<StorageAccountName>\",\"accountKey\":\"<StorageKey>\",\"blobContainerName\":\"AdventureWorksContainer\"}}' `
 --migration-service "/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.DataMigration/SqlMigrationServices/MySqlMigrationService" `
 --scope "/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.Sql/managedInstances/<ManagedInstanceName>" `
 --source-database-name "AdventureWorks2019" `
