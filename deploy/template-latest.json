@@ -20,7 +20,7 @@
     "variables": {
         // Storage account
         "storageAccountName": "[toLower(concat('storage',parameters('suffixName')))]",
-  
+
         // SQL VM
         "location": "[resourceGroup().location]",
         "virtualMachineName": "[if(greaterOrEquals(length(toLower(concat('sqlvm','-',parameters('suffixName')))),15),substring(toLower(concat('sqlvm','-',toLower(concat('sqlvm','-',parameters('suffixName'))))),0,15),toLower(concat('sqlvm','-',parameters('suffixName'))))]",
@@ -52,21 +52,21 @@
                 }
             },
             {
-                        "name": "AllowAnyMS_SQLInbound",
-                        "properties": {
-                            "protocol": "TCP",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "1433",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 310,
-                            "direction": "Inbound",
-                            "sourcePortRanges": [],
-                            "destinationPortRanges": [],
-                            "sourceAddressPrefixes": [],
-                            "destinationAddressPrefixes": []
-                        }
+                "name": "AllowAnyMS_SQLInbound",
+                "properties": {
+                    "protocol": "TCP",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "1433",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "*",
+                    "access": "Allow",
+                    "priority": 310,
+                    "direction": "Inbound",
+                    "sourcePortRanges": [],
+                    "destinationPortRanges": [],
+                    "sourceAddressPrefixes": [],
+                    "destinationAddressPrefixes": []
+                }
             }
         ],
         "publicIpAddressName": "[format('{0}-publicip-{1}', variables('virtualMachineName'), uniqueString(variables('virtualMachineName')))]",
@@ -83,7 +83,7 @@
             "diskSizeGB": 1023
         },
         "tempDbPath": "D:\\SQLTemp",
- 
+
         // SQL MI 
         "SQLMIName": "[if(greaterOrEquals(length(toLower(concat('sqlmi','-',parameters('suffixName')))),60),substring(toLower(concat('sqlmi','-',toLower(concat('sqlmi','-',parameters('suffixName'))))),0,60),toLower(concat('sqlmi','-',parameters('suffixName'))))]",
         "SQLMIAdministratorLogin": "sqladmin",
@@ -119,9 +119,7 @@
             },
             "kind": "Storage"
         },
-
-
-{
+        {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2022-05-01",
             "name": "[concat(variables('storageAccountName'), '/default/migration')]",
@@ -129,22 +127,9 @@
                 "[variables('storageAccountName')]"
             ],
             "properties": {
-                "immutableStorageWithVersioning": {
-                    "enabled": false
-                },
-                "defaultEncryptionScope": "$account-encryption-key",
-                "denyEncryptionScopeOverride": false,
-                "publicAccess": "None"
+                "publicAccess": "Blob"
             }
         },
-
-
-
-
-
-
-
-
         {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2021-08-01",
@@ -359,7 +344,7 @@
             ]
         },
         {
-        // SQLMI Resources
+            // SQLMI Resources
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2021-08-01",
             "name": "[variables('SQLMINetworkSecurityGroupName')]",

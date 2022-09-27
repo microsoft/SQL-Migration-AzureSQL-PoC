@@ -1,4 +1,4 @@
-# Start Online Database Migration
+# Start database migration
 
 Now, it's time to perform a online migration of the Adventureworks2019 database from SQL Server on Azure VM to an Azure SQL Managed Instance by using Microsoft Azure CLI.
 
@@ -37,37 +37,22 @@ Now, it's time to perform a online migration of the Adventureworks2019 database 
     
     -- Back up the full AdventureWorks2019 database to the container that you created
     BACKUP DATABASE AdventureWorks2019 TO URL = 'https://storagemigration.blob.core.windows.net/backup/AdventureWorks2019.bak'
+    WITH CHECKSUM
     ```
 
-3. **Online migration**
-
-    Use the **az datamigration sql-managed-instance create** command to create and start a database migration.
-
-    ```dotnetcli
-    az datamigration sql-managed-instance create `
-    --source-location '{\"AzureBlob\":{\"storageAccountResourceId\":\"/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.Storage/storageAccounts/<StorageAccountName>\",\"accountKey\":\"<StorageKey>\",\"blobContainerName\":\"AdventureWorksContainer\"}}' `
-    --migration-service "/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.DataMigration/SqlMigrationServices/MySqlMigrationService" `
-    --scope "/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.Sql/managedInstances/<ManagedInstanceName>" `
-    --source-database-name "AdventureWorks2019" `
-    --source-sql-connection authentication="SqlAuthentication" data-source="<AzureSQLVM_IPAddress>" password="My$upp3r$ecret" user-name="sqladmin" `
-    --target-db-name "AdventureWorks2019" `
-    --resource-group <ResourceGroupName> `
-    --managed-instance-name <ManagedInstanceName>
-    ```
-
-4. In the Azure Portal, find the resource group you just created and navigate to the Azure SQL VM.
-5. In the overview page, copy the Public IP Address
+3. In the Azure Portal, find the resource group you just created and navigate to the Azure SQL VM.
+4. In the overview page, copy the Public IP Address
     ![sqlvm-ip](../media/sqlvm-ip.png)
 
     > [!CAUTION]
     > Now you have to connect to the Jumpbox VM.
     > Use the credentials provided in the deploy page.
 
-6. Install az datamigration extension. Open either a command shell or PowerShell as administrator.
+5. Install az datamigration extension. Open either a command shell or PowerShell as administrator.
 
     `az extension add --name datamigration`
 
-7. Run the following to login from your client using your default web browser
+6. Run the following to login from your client using your default web browser
 
     `az login`
 
@@ -168,3 +153,80 @@ This step is optional. We already have a Azure SQL MI provisioned.
     > You can look into the output folder to find a HTML file which also gives the details of SKU being recommended.
 
     Learn more about using [CLI to get SKU recommendation](https://github.com/Azure-Samples/data-migration-sql/blob/main/CLI/sql-server-sku-recommendation.md#performance-data-collection-using-connection-string)
+
+## Migration
+
+1. **Online migration**
+
+    Use the **az datamigration sql-managed-instance create** command to create and start a database migration.
+
+    ```dotnetcli
+    az datamigration sql-managed-instance create `
+    --source-location '{\"AzureBlob\":{\"storageAccountResourceId\":\"/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.Storage/storageAccounts/<StorageAccountName>\",\"accountKey\":\"<StorageKey>\",\"blobContainerName\":\"AdventureWorksContainer\"}}' `
+    --migration-service "/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.DataMigration/SqlMigrationServices/MySqlMigrationService" `
+    --scope "/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.Sql/managedInstances/<ManagedInstanceName>" `
+    --source-database-name "AdventureWorks2019" `
+    --source-sql-connection authentication="SqlAuthentication" data-source="<AzureSQLVM_IPAddress>" password="My$upp3r$ecret" user-name="sqladmin" `
+    --target-db-name "AdventureWorks2019" `
+    --resource-group <ResourceGroupName> `
+    --managed-instance-name <ManagedInstanceName>
+    ```
+
+2. **Offline Migration**
+
+    To start an offline migration, you should add --offline-configuration parameter.
+
+    ```dotnetcli
+    az datamigration sql-managed-instance create `
+    --source-location '{\"AzureBlob\":{\"storageAccountResourceId\":\"/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.Storage/storageAccounts/<StorageAccountName>\",\"accountKey\":\"<StorageKey>\",\"blobContainerName\":\"AdventureWorksContainer\"}}' `
+    --migration-service "/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.DataMigration/SqlMigrationServices/MySqlMigrationService" `
+    --scope "/subscriptions/<SubscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.Sql/managedInstances/<ManagedInstanceName>" `
+    --source-database-name "AdventureWorks2019" `
+    --source-sql-connection authentication="SqlAuthentication" data-source="<AzureSQLVM_IPAddress>" password="My$upp3r$ecret" user-name="sqladmin" `
+    --target-db-name "AdventureWorks2019" `
+    --resource-group <ResourceGroupName> `
+    --managed-instance-name <ManagedInstanceName>
+    --offline-configuration last-backup-name="AdventureWorksTransactionLog2.trn" offline=true
+    ```
+
+    > [!TIP]
+    > You should take all necessary backups.
+
+    Learn more about using [CLI to migrate](https://github.com/Azure-Samples/data-migration-sql/blob/main/CLI/sql-server-to-sql-mi-blob.md#start-online-database-migration)
+
+3. Monitoring
+
+    To monitor the migration, check the status of task.
+    1. Gets complete migration detail
+
+        ```dotnetcli
+        az datamigration sql-managed-instance show --managed-instance-name "<ManagedInstanceName>" --resource-group "<ResourceGroupName>" --target-db-name "AdventureWorks2019" --expand=MigrationStatusDetails
+        ```
+
+    2. *ProvisioningState* should be "**Creating**", "**Failed**" or "**Succeeded**"
+
+        ```dotnetcli
+        az datamigration sql-managed-instance show --managed-instance-name "<ManagedInstanceName>" --resource-group "<ResourceGroupName>" --target-db-name "AdventureWorks2019" --expand=MigrationStatusDetails --query "properties.provisioningState"
+        ```
+
+    3. *MigrationStatus* should be "**InProgress**", "**Canceling**", "**Failed**" or "**Succeeded**"
+
+        ```dotnetcli
+        az datamigration sql-managed-instance show --managed-instance-name "<ManagedInstanceName>" --resource-group "<ResourceGroupName>" --target-db-name "AdventureWorks2019" --expand=MigrationStatusDetails --query "properties.migrationStatus"
+        ```
+
+4. Cutover
+
+    Use the **az datamigration sql-managed-instance cutover** command to perform cutover.
+
+    1. Obtain the MigrationOperationId
+
+        ```dotnetcli
+        $migOpId = az datamigration sql-managed-instance show --managed-instance-name "<ManagedInstanceName>" --resource-group "<ResourceGroupName>" --target-db-name "AdventureWorks2019" --expand=MigrationStatusDetails --query "properties.migrationOperationId"
+        ```
+
+    2. Perform Cutover
+
+        ```dotnetcli
+        az datamigration sql-managed-instance cutover --managed-instance-name "<ManagedInstanceName>" --resource-group "<ResourceGroupName>" --target-db-name "AdventureWorks2019" --migration-operation-id $migOpId
+        ```
