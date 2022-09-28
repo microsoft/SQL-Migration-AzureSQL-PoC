@@ -21,6 +21,9 @@
         // Storage account
         "storageAccountName": "[toLower(concat('storage',parameters('suffixName')))]",
 
+        // Database Migration Service
+        "dmsName": "MySqlMigrationService",
+
         // SQL VM
         "location": "[resourceGroup().location]",
         "virtualMachineName": "[if(greaterOrEquals(length(toLower(concat('sqlvm','-',parameters('suffixName')))),15),substring(toLower(concat('sqlvm','-',toLower(concat('sqlvm','-',parameters('suffixName'))))),0,15),toLower(concat('sqlvm','-',parameters('suffixName'))))]",
@@ -130,6 +133,14 @@
                 "publicAccess": "Blob"
             }
         },
+        // Azure DMS
+        {
+            "type": "Microsoft.DataMigration/sqlMigrationServices",
+            "apiVersion": "2022-03-30-preview",
+            "name": "[variables('dmsName')]",
+            "location": "[variables('location')]",
+            "properties": {}
+        },
         {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2021-08-01",
@@ -211,9 +222,6 @@
                     }
                 ],
                 "enableAcceleratedNetworking": true
-                //                "networkSecurityGroup": {
-                //                     "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
-                //                }
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]",
@@ -293,12 +301,9 @@
                 "publisher": "Microsoft.Compute",
                 "type": "CustomScriptExtension",
                 "typeHandlerVersion": "1.9",
-                //                "settings": {
-                //                    "commandToExecute": "[variables('extensions_CustomScriptExtension_commandToExecute')]"
-                //                },
                 "settings": {
                     "fileUris": [
-                        "https://1clickpocmigrationsqlmi.blob.core.windows.net/scripts/PostInstallation.ps1?sv=2021-04-10&st=2022-09-06T16%3A01%3A59Z&se=2050-09-07T16%3A01%3A00Z&sr=b&sp=r&sig=CEx5Ug87hQz7dlbuvbYjhcg85wmHkexQTwc62Kebgpk%3D"
+                        "https://raw.githubusercontent.com/tiagobalabuch/SQL-Repo/master/deploy/PostInstallation.ps1"
                     ],
                     "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File PostInstallation.ps1"
                 },
@@ -650,12 +655,7 @@
                         }
                     }
                 ]
-                //,
-                //               "networkSecurityGroup": {
-                //                   "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('jbNetworkSecurityGroupName'))]"
-                //   }
             }
-
         },
         {
             "name": "[variables('jbVirtualMachineName')]",
@@ -713,12 +713,9 @@
                 "publisher": "Microsoft.Compute",
                 "type": "CustomScriptExtension",
                 "typeHandlerVersion": "1.9",
-                //                "settings": {
-                //                    "commandToExecute": "[variables('extensions_CustomScriptExtension_commandToExecute')]"
-                //                },
                 "settings": {
                     "fileUris": [
-                        "https://1clickpocmigrationsqlmi.blob.core.windows.net/scripts/JumpboxPostInstallation.ps1?sv=2021-04-10&st=2022-09-08T08%3A25%3A27Z&se=2050-09-09T08%3A25%3A00Z&sr=b&sp=r&sig=QI7z3RqP0fPb%2FzB%2Bv8%2F0Rv9I1REeTVyMy0Oi3XCbOQ0%3D"
+                        "https://raw.githubusercontent.com/tiagobalabuch/SQL-Repo/master/deploy/JumpboxPostInstallation.ps1"
                     ],
                     "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File JumpboxPostInstallation.ps1"
                 },
@@ -726,7 +723,6 @@
                 "protectedSettings": {}
             }
         }
-
         // END JUMP BOM
     ],
     "outputs": {

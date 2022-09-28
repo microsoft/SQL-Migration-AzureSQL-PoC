@@ -41,7 +41,7 @@ In addition, the Azure CLI command [az datamigration](https://learn.microsoft.co
     > [!IMPORTANT]
     > Change the IP Address
 
-    `az datamigration get-assessment --connection-string "Data Source=20.2.1.177,1433;Initial Catalog=master;User Id=sqladmin;Password=My$upp3r$ecret" --output-folder "C:\Output" --overwrite`
+    `az datamigration get-assessment --connection-string "Data Source=20.2.100.5,1433;Initial Catalog=master;User Id=sqladmin;Password=My$upp3r$ecret" --output-folder "C:\Output" --overwrite`
 
 2. Assessment at scale using config file
 
@@ -74,7 +74,7 @@ This step is optional. We already have a Azure SQL MI provisioned.
 
 1. We can run a SQL server performance data collection using the ***az datamigration performance-data-collection*** command.
 
-    `az datamigration performance-data-collection --connection-string "Data Source=20.229.104.177,1433;Initial Catalog=master;User Id=sqladmin;Password=My$upp3r$ecret" --output-folder "C:\Output" --perf-query-interval 10 --number-of-iteration 5 --static-query-interval 120`
+    `az datamigration performance-data-collection --connection-string "Data Source=20.2.100.5,1433;Initial Catalog=master;User Id=sqladmin;Password=My$upp3r$ecret" --output-folder "C:\Output" --perf-query-interval 10 --number-of-iteration 5 --static-query-interval 120`
 
     > [!TIP]
     > Collect as much data as you want, then stop the process.
@@ -109,6 +109,8 @@ This step is optional. We already have a Azure SQL MI provisioned.
     Learn more about using [CLI to perform data collection](https://github.com/Azure-Samples/data-migration-sql/blob/main/CLI/sql-server-sku-recommendation.md#performance-data-collection-using-connection-string)
 
 ## SKU Recommendation
+
+This step is optional. We already have a Azure SQL MI provisioned.
 
 1. We can get SKU recommendation using the **az datamigration get-sku-recommendation** command.
 
