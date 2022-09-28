@@ -31,11 +31,11 @@ Now, it's time to perform a online migration of the Adventureworks2019 database 
       -- this name must match the container path, start with https and must not contain a forward slash at the end
     WITH IDENTITY='SHARED ACCESS SIGNATURE' 
       -- this is a mandatory string and should not be changed   
-     , SECRET = '' 
+     , SECRET = 'XXXXXXX' 
        -- this is the shared access signature key. Don't forget to remove the first character "?"   
     GO
     
-    -- Back up the full AdventureWorks2019 database to the container that you created
+    -- Back up the full AdventureWorks2019 database to the container
     BACKUP DATABASE AdventureWorks2019 TO URL = 'https://storagemigration.blob.core.windows.net/backup/AdventureWorks2019.bak'
     WITH CHECKSUM
     ```
@@ -94,7 +94,7 @@ This step is optional. We already have a Azure SQL MI provisioned.
 
 1. We can run a SQL server performance data collection using the ***az datamigration performance-data-collection*** command.
 
-    `az datamigration performance-data-collection --connection-string "Data Source=20.229.104.177,1433;Initial Catalog=master;User Id=sqladmin;Password=My$upp3r$ecret" --output-folder "C:\Output" --perf-query-interval 10 --number-of-iteration 5 --static-query-interval 120`
+    `az datamigration performance-data-collection --connection-string "Data Source=20.2.100.5,1433;Initial Catalog=master;User Id=sqladmin;Password=My$upp3r$ecret" --output-folder "C:\Output" --perf-query-interval 10 --number-of-iteration 5 --static-query-interval 120`
 
     > [!TIP]
     > Collect as much data as you want, then stop the process.
@@ -130,7 +130,7 @@ This step is optional. We already have a Azure SQL MI provisioned.
 
 ## SKU Recommendation
 
-1. We can get SKU recommendation using the **az datamigration get-sku-recommendation** command.
+1. After collecting data performance, we can get SKU recommendation using the **az datamigration get-sku-recommendation** command.
 
     `az datamigration get-sku-recommendation --output-folder "C:\Output" --display-result --overwrite`
 
@@ -174,7 +174,7 @@ This step is optional. We already have a Azure SQL MI provisioned.
 
 2. **Offline Migration**
 
-    To start an offline migration, you should add --offline-configuration parameter.
+    To start an offline migration, you should add **--offline-configuration** parameter.
 
     ```dotnetcli
     az datamigration sql-managed-instance create `
@@ -230,3 +230,7 @@ This step is optional. We already have a Azure SQL MI provisioned.
         ```dotnetcli
         az datamigration sql-managed-instance cutover --managed-instance-name "<ManagedInstanceName>" --resource-group "<ResourceGroupName>" --target-db-name "AdventureWorks2019" --migration-operation-id $migOpId
         ```
+
+## Migrating at scale
+
+This script performs an [end to end migration of a multiple databases in multiple servers](https://github.com/Azure-Samples/data-migration-sql/tree/main/CLI/scripts/multiple%20databases)
