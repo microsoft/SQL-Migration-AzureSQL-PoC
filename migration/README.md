@@ -20,7 +20,7 @@ Now, it's time to perform a online migration of the Adventureworks2019 database 
 
     > [!CAUTION]
     > Now you have to connect to the Jumpbox VM.
-    > Use the credentials provided in the deploy page.
+    > Use the credentials provided on the deploy page.
 
 4. Backup database
 
