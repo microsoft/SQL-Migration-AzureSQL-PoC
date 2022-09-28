@@ -138,7 +138,7 @@ This step is optional. We already have a Azure SQL MI provisioned.
 
 ## Page Navigator
 
-[Index: Table of Contents]()
+[Index: Table of Contents](../index.md)
 
 [Prev: 1 Click Deploy](../deploy/README.md)
 

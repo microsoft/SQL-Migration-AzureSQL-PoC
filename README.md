@@ -21,6 +21,6 @@ SQL Modernization to Azure SQL MI offers a long list of benefits. We have just l
 
 ## Page Navigator
 
-[Index: Table of Contents]()
+[Index: Table of Contents](index.md)
 
 [Next: 1 Click Deploy](deploy/README.md)

@@ -131,6 +131,6 @@ This script performs an [end to end migration of a multiple databases in multipl
 
 ## Page Navigator
 
-[Index: Table of Contents]()
+[Index: Table of Contents](../index.md)
 
 [Prev: Assessment](../assessment/README.md)

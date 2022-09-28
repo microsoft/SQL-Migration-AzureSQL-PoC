@@ -82,8 +82,8 @@ Any use of third-party trademarks or logos are subject to those third-party's po
 
 ## Page Navigator
 
-[Index: Table of Contents]()
+[Index: Table of Contents](../index.md)
 
-[Prev: SQL VM migration to Azure SQL Managed Instance POC](../../README.md)
+[Prev: SQL VM migration to Azure SQL Managed Instance POC](../README.md)
 
 [Next: Assessment](../assessment/README.md)
