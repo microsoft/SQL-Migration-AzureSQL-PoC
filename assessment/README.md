@@ -135,3 +135,11 @@ This step is optional. We already have a Azure SQL MI provisioned.
     > You can look into the output folder to find a HTML file which also gives the details of SKU being recommended.
 
     Learn more about using [CLI to get SKU recommendation](https://github.com/Azure-Samples/data-migration-sql/blob/main/CLI/sql-server-sku-recommendation.md#performance-data-collection-using-connection-string)
+
+## Page Navigator
+
+[Index: Table of Contents]()
+
+[Prev: 1 Click Deploy](../deploy/README.md)
+
+[Next: Migration](../migration/README.md)

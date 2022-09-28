@@ -14,7 +14,15 @@ Now, it's time to perform a online migration of the Adventureworks2019 database 
 
     In addition, the Azure CLI command [az datamigration](https://learn.microsoft.com/en-us/cli/azure/datamigration?view=azure-cli-latest) can be used to manage data migration at scale.
 
-2. Backup database
+2. In the Azure Portal, find the resource group you just created and navigate to the Azure SQL VM.
+3. In the overview page, copy the Public IP Address
+    ![sqlvm-ip](../media/sqlvm-ip.png)
+
+    > [!CAUTION]
+    > Now you have to connect to the Jumpbox VM.
+    > Use the credentials provided in the deploy page.
+
+4. Backup database
 
     Backup must be taken before starting the migration:
     - [Create SAS tokens for your storage containers](https://learn.microsoft.com/en-us/azure/cognitive-services/translator/document-translation/create-sas-tokens?tabs=Containers)
@@ -38,19 +46,7 @@ Now, it's time to perform a online migration of the Adventureworks2019 database 
     WITH CHECKSUM
     ```
 
-3. In the Azure Portal, find the resource group you just created and navigate to the Azure SQL VM.
-4. In the overview page, copy the Public IP Address
-    ![sqlvm-ip](../media/sqlvm-ip.png)
 
-    > [!CAUTION]
-    > Now you have to connect to the Jumpbox VM.
-    > Use the credentials provided in the deploy page.
-
-## Azure Database Migration Service
-
-Use the az datamigration sql-managed-instance create command to  create new instance of Azure Database Migration Service.
-
-    az datamigration sql-service create --resource-group "1clickpoc" --sql-migration-service-name "MySqlMigrationService" --location "<location>"
 
 ## Migration
 
@@ -69,6 +65,8 @@ Use the az datamigration sql-managed-instance create command to  create new inst
     --resource-group <ResourceGroupName> `
     --managed-instance-name <ManagedInstanceName>
     ```
+
+    Learn more about using [CLI to migrate](https://github.com/Azure-Samples/data-migration-sql/blob/main/CLI/sql-server-to-sql-mi-blob.md#start-online-database-migration)
 
 2. **Offline Migration**
 
@@ -89,8 +87,6 @@ Use the az datamigration sql-managed-instance create command to  create new inst
 
     > [!TIP]
     > You should take all necessary backups.
-
-    Learn more about using [CLI to migrate](https://github.com/Azure-Samples/data-migration-sql/blob/main/CLI/sql-server-to-sql-mi-blob.md#start-online-database-migration)
 
 3. Monitoring
 
@@ -132,3 +128,9 @@ Use the az datamigration sql-managed-instance create command to  create new inst
 ## Migrating at scale
 
 This script performs an [end to end migration of a multiple databases in multiple servers](https://github.com/Azure-Samples/data-migration-sql/tree/main/CLI/scripts/multiple%20databases)
+
+## Page Navigator
+
+[Index: Table of Contents]()
+
+[Prev: Assessment](../assessment/README.md)
