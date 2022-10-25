@@ -12,7 +12,7 @@ Select the Azure subscription that you would like to use for the lab.
 Specify a name for the resource group. The template will deploy 20 Azure resources in a resource group.
 Specify the region for the resource group.
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fsql_1click_pocs%2Finitial-draft%2Fdeploy%2Fdeploy.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)(https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fsql_1click_pocs%2Fmain%2Fdeploy%2Ftemplate-latest.json)
 
 ## Deployment diagram
 
