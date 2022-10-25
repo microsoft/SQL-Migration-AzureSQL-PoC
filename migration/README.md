@@ -2,27 +2,15 @@
 
 Now, it's time to perform a online migration of the Adventureworks2019 database from SQL Server on Azure VM to an Azure SQL Managed Instance by using Microsoft Azure CLI.
 
-1. Run the following to login from your client using your default web browser
-
-    `az login`
-
-    If you have more than one subscription, you can select a particular subscription.
-
-    `az account set --subscription <subscription-id>`
-
-    The [Azure SQL migration extension for Azure Data Studio](https://learn.microsoft.com/en-us/sql/azure-data-studio/extensions/azure-sql-migration-extension?view=sql-server-ver16) enables you to assess, get Azure recommendations and migrate your SQL Server databases to Azure.
-
-    In addition, the Azure CLI command [az datamigration](https://learn.microsoft.com/en-us/cli/azure/datamigration?view=azure-cli-latest) can be used to manage data migration at scale.
-
-2. In the Azure Portal, find the resource group you just created and navigate to the Azure SQL VM.
-3. In the overview page, copy the Public IP Address
+1. In the Azure Portal, find the resource group you just created and navigate to the Azure SQL VM.
+2. In the overview page, copy the Public IP Address
     ![sqlvm-ip](../media/sqlvm-ip.png)
 
     > [!CAUTION]
     > Now you have to connect to the Jumpbox VM.
     > Use the credentials provided on the deploy page.
 
-4. Backup database
+3. Backup database
 
     Backup must be taken before starting the migration:
     - [Create SAS tokens for your storage containers](https://learn.microsoft.com/en-us/azure/cognitive-services/translator/document-translation/create-sas-tokens?tabs=Containers)
@@ -33,7 +21,7 @@ Now, it's time to perform a online migration of the Adventureworks2019 database 
 
     ```sql
     USE master
-    CREATE CREDENTIAL [https://storagemigration.blob.core.windows.net/backup] 
+    CREATE CREDENTIAL [https://storagemigration.blob.core.windows.net/migration] 
       -- this name must match the container path, start with https and must not contain a forward slash at the end
     WITH IDENTITY='SHARED ACCESS SIGNATURE' 
       -- this is a mandatory string and should not be changed   
@@ -42,7 +30,7 @@ Now, it's time to perform a online migration of the Adventureworks2019 database 
     GO
     
     -- Back up the full AdventureWorks2019 database to the container
-    BACKUP DATABASE AdventureWorks2019 TO URL = 'https://storagemigration.blob.core.windows.net/backup/AdventureWorks2019.bak'
+    BACKUP DATABASE AdventureWorks2019 TO URL = 'https://storagemigration.blob.core.windows.net/migration/AdventureWorks2019.bak'
     WITH CHECKSUM
     ```
 
@@ -50,7 +38,22 @@ Now, it's time to perform a online migration of the Adventureworks2019 database 
 
 ## Migration
 
-1. **Online migration**
+1. Run the following to login from your client using your default web browser
+    > [!CAUTION]
+    >
+    > Now you have to **connect to the Jumpbox VM**. Use the credentials provided on the deploy page.
+
+    `az login`
+
+    If you have more than one subscription, you can select a particular subscription.
+
+    `az account set --subscription <subscription-id>`
+
+    The [Azure SQL migration extension for Azure Data Studio](https://learn.microsoft.com/en-us/sql/azure-data-studio/extensions/azure-sql-migration-extension?view=sql-server-ver16) enables you to assess, get Azure recommendations and migrate your SQL Server databases to Azure.
+
+    In addition, the Azure CLI command [az datamigration](https://learn.microsoft.com/en-us/cli/azure/datamigration?view=azure-cli-latest) can be used to manage data migration at scale. 
+
+2. **Online migration**
 
     Use the **az datamigration sql-managed-instance create** command to create and start a database migration.
 
@@ -68,7 +71,7 @@ Now, it's time to perform a online migration of the Adventureworks2019 database 
 
     Learn more about using [CLI to migrate](https://github.com/Azure-Samples/data-migration-sql/blob/main/CLI/sql-server-to-sql-mi-blob.md#start-online-database-migration)
 
-2. **Offline Migration**
+3. **Offline Migration**
 
     To start an offline migration, you should add **--offline-configuration** parameter.
 
@@ -88,7 +91,7 @@ Now, it's time to perform a online migration of the Adventureworks2019 database 
     > [!TIP]
     > You should take all necessary backups.
 
-3. Monitoring
+4. Monitoring
 
     To monitor the migration, check the status of task.
     1. Gets complete migration detail
@@ -109,7 +112,7 @@ Now, it's time to perform a online migration of the Adventureworks2019 database 
         az datamigration sql-managed-instance show --managed-instance-name "<ManagedInstanceName>" --resource-group "<ResourceGroupName>" --target-db-name "AdventureWorks2019" --expand=MigrationStatusDetails --query "properties.migrationStatus"
         ```
 
-4. Cutover
+5. Cutover for ONLINE migration
 
     Use the **az datamigration sql-managed-instance cutover** command to perform cutover.
 

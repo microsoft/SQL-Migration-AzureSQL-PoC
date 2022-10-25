@@ -14,15 +14,13 @@ In addition, the Azure CLI command [az datamigration](https://learn.microsoft.co
 
 ## Getting Started
 
-> [!CAUTION]
->
-> Now you have to **connect to the Jumpbox VM**.
->
-> Use the credentials provided on the deploy page.
-
 1. In the Azure Portal, find the resource group you just created and navigate to the Azure SQL VM.
 2. In the overview page, copy the Public IP Address
     ![sqlvm-ip](../media/sqlvm-ip.png)
+
+    > [!CAUTION]
+    >
+    > Now you have to **connect to the Jumpbox VM**. Use the credentials provided on the deploy page.
 
 3. Install az datamigration extension. Open either a command shell or PowerShell as administrator.
 
