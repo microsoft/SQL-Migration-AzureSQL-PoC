@@ -33,17 +33,8 @@ else {
     Write-Host "Module exists"
 }
 
-# Storage account name and Container name
-# $StorageAccountName = "1clickpocmigrationsqlmi"
-$ContainerName = "databases"
-
-# Give the connection string.
-$ConnectionString = "BlobEndpoint=https://1clickpocmigrationsqlmi.blob.core.windows.net/;SharedAccessSignature=sv=2021-06-08&ss=bfqt&srt=co&sp=rwdlacupiytfx&se=2050-09-04T18:00:08Z&st=2022-09-04T10:00:08Z&spr=https&sig=8OSfBUeMjicbBbpq9LGqR9ZRkYoI1%2F8ZbsXz3SWT9O8%3D"
-$Ctx = New-AzStorageContext -ConnectionString $ConnectionString
-
 #Download File
 $FileName1 = "AdventureWorks2019.bak"
-$FileName2 = "AW_with_issues.bak"
 
 #Destination Path
 $localTargetDirectory = "C:\temp\1clickPoC"
@@ -52,10 +43,10 @@ $localTargetDirectory = "C:\temp\1clickPoC"
 CreateFolder $localTargetDirectory
 
 #Download Blob to the Destination Path
-Write-Host "Downloading files"
-Get-AzStorageBlobContent -Blob $FileName1 -Container $ContainerName -Destination $localTargetDirectory -Context $ctx -Force
-Get-AzStorageBlobContent -Blob $FileName2 -Container $ContainerName -Destination $localTargetDirectory -Context $ctx -Force
-Write-Host "Files downloaded successfully"
+Write-Host "Downloading file"
+$finalPath = $localTargetDirectory + "\" + $FileName1
+Invoke-WebRequest 'https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak' -OutFile $finalPath
+Write-Host "File downloaded"
 
 #Install Software
 Write-Host "Installing Azure Data Studio"
@@ -78,8 +69,31 @@ Import-Module "sqlps" -DisableNameChecking
 Invoke-Sqlcmd "EXEC sp_configure filestream_access_level, 2" -Username $userName -Password $userPassword
 Invoke-Sqlcmd "RECONFIGURE" -Username $userName -Password $userPassword
 Write-Host "Filestream configured"
-
+# Restore Databases
 Write-Host "Restoring database"
 Invoke-Sqlcmd "RESTORE DATABASE [AdventureWorks2019] FROM DISK = N'C:\temp\1clickPoC\AdventureWorks2019.bak' WITH FILE = 1 , MOVE N'AdventureWorks2017'  TO N'F:\SQLData\AdventureWorks2019.mdf', MOVE N'AdventureWorks2017_log' TO N'G:\SQLLog\AdventureWorks2019_log.ldf', NOUNLOAD, STATS = 5;" -Username $userName -Password $userPassword
-Invoke-Sqlcmd "RESTORE DATABASE [AdventureWorks_with_issues] FROM DISK = N'C:\temp\1clickPoC\AW_with_issues.bak'WITH FILE = 1, MOVE N'AdventureWorksLT2012_Data' TO N'F:\SQLData\AdventureWorksLT2012.mdf', MOVE N'AdventureWorksLT2012_Log' TO N'G:\SQLLog\AdventureWorksLT2012_log.ldf', MOVE N'AdventureWorksLT2012_Log2' TO N'G:\SQLLog\AdventureWorksLT2012_log2.ldf', MOVE N'Photos1' TO N'F:\SQLData\Photos1.ndf', NOUNLOAD;" -Username $userName -Password $userPassword
+Invoke-Sqlcmd "RESTORE DATABASE [AdventureWorks_with_issues] FROM DISK = N'C:\temp\1clickPoC\AdventureWorks2019.bak' WITH FILE = 1 , MOVE N'AdventureWorks2017'  TO N'F:\SQLData\AdventureWorks_with_issues.mdf', MOVE N'AdventureWorks2017_log' TO N'G:\SQLLog\AdventureWorks_with_issues.ldf', NOUNLOAD, STATS = 5;" -Username $userName -Password $userPassword
+
+# Create some issues for migration
+Invoke-Sqlcmd "ALTER DATABASE [AdventureWorks_with_issues] ADD FILEGROUP [Filestream_data] CONTAINS FILESTREAM " -Username $userName -Password $userPassword
+Invoke-Sqlcmd "ALTER DATABASE [AdventureWorks_with_issues] ADD FILE ( NAME = N'AdventureWorks_fs', FILENAME = N'F:\SQLData\AdventureWorks_fs' ) TO FILEGROUP [Filestream_data]" -Username $userName -Password $userPassword
+
+$query = @'
+CREATE TABLE [dbo].[Photos](
+	[Id] [UNIQUEIDENTIFIER] ROWGUIDCOL  NOT NULL,
+	[PhotoCatalogID] [INT] NULL,
+	[Photo] [VARBINARY](MAX) FILESTREAM  NULL,
+	UNIQUE NONCLUSTERED 
+	(
+		[PhotoCatalogID] ASC
+	),
+	UNIQUE NONCLUSTERED 
+	(
+		[Id] ASC
+	)
+	) ON [PRIMARY] FILESTREAM_ON [Filestream_data]
+GO
+'@
+
+Invoke-Sqlcmd -Query $query -Username $userName -Password $userPassword -Database 'AdventureWorks_with_issues'
 Write-Host "Restore completed"
