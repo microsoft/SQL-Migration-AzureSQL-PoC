@@ -1,4 +1,4 @@
-# SQL Server on Azure Virtual Machine database migration to Azure SQL Managed Instance - POC Environment Setup
+# SQL Server database migration - POC Environment Setup
 
 This deployment package allows the user to deploy a Proof-of-Concept environment of Azure SQL VM migration to Azure SQL Managed Instance with encapsulate best practices and step by step execution steps that will enable you to test, adjust and fully deploy automated solution at scale. This is an approach that could help with large migrations at scale for specific workload use cases.
 
