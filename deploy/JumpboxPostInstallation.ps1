@@ -1,9 +1,12 @@
 Set-ExecutionPolicy Unrestricted -Force; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-#Install Software
+# Install Software
 Write-Host "Installing Azure Data Studio"
 choco install azure-data-studio -y
 choco install azure-cli -y
 choco install dotnetcore -y
+
+# Instal Azure SQL migration extension for Azure Data Studio
+Start-Process "C:\Program Files\Azure Data Studio\bin\azuredatastudio" -ArgumentList @("--install-extension microsoft.sql-migration","--force") -Wait
 
 # Function to create folders
 function CreateFolder {
