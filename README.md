@@ -44,4 +44,4 @@ Any use of third-party trademarks or logos are subject to those third-party's po
 
 [Index: Table of Contents](index.md)
 
-[Next: 1 Click Deploy](deploy/README.md)
+[Next: One-click Deploy](deploy/README.md)
