@@ -5,7 +5,7 @@ choco install azure-data-studio -y
 choco install azure-cli -y
 choco install dotnetcore -y
 
-# Instal Azure SQL migration extension for Azure Data Studio
+# Instal Azure SQL migration extension for Azure Data Studio 
 Start-Process "C:\Program Files\Azure Data Studio\bin\azuredatastudio" -ArgumentList @("--install-extension microsoft.sql-migration","--force") -Wait
 
 # Function to create folders

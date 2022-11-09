@@ -42,7 +42,7 @@ $localTargetDirectory = "C:\temp\1clickPoC"
 #Create Folders
 CreateFolder $localTargetDirectory
 
-#Download Blob to the Destination Path
+#Download Blob to the Destination Path 
 Write-Host "Downloading file"
 $finalPath = $localTargetDirectory + "\" + $FileName1
 Invoke-WebRequest 'https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak' -OutFile $finalPath

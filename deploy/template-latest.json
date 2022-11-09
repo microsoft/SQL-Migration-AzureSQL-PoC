@@ -630,7 +630,7 @@
                 }
             }
         },
-        //End Vnet Peering
+        //End Vnet Peering 
         {
             "name": "[variables('jbNetworkInterfaceName')]",
             "type": "Microsoft.Network/networkInterfaces",
