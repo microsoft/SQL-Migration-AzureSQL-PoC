@@ -8,6 +8,10 @@ You need to have at least owner role or contributor role for the Azure subscript
 
 Check this documentation for [RBAC role-assignments](https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-steps).
 
+## [One-click SQL Migration PoC](deploy/README.md)
+
+Take advantage of this one-click SQL Migration PoC to accelerate your migration to Azure SQL.
+
 ## Modernization Benefits
 
 SQL Modernization to Azure SQL MI offers a long list of benefits. We have just listed a few that can be easily understood by a customer with the lowest skillset on SQL.
